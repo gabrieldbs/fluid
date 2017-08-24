@@ -4,45 +4,40 @@
 #include <stdlib.h>
 #include <math.h>
 
-int circ(float xmin ,float xmax,float ymin ,float ymax,float paso,float r,float d, float b){
+int burger(float dt ,float T,float N,float nu){
  FILE *pt;
- pt=fopen("circulo.dat","w");
- FILE *pttt;
- pttt=fopen("tranformado2.dat","w");
- int imax;
- float x=xmin,y=ymin,xt=0,yt=0;
- imax =(xmax-xmin)/paso;
- float w,q,l; // elipse 
- w=r+(b*b)/r; 
- q=r-(b*b)/r;
- 
-  for(int i=0;i<imax;i++){ 
-    x=xmin+i*paso;
-    for(int j=0;j<imax;j++){
-	   y=ymin + j*paso;
-		l=((x*x)+(y*y));
-		w=(1+(b*b)/(l));
-		q=(1-(b*b)/(l));
-	   xt=x*w;
-	   yt=y*q;
-		if(x*x+y*y>r*r & x*x+y*y-r*r<d){
-		  fprintf(pt,"%f\t%f\n",x,y);
-			fprintf(pttt,"%f\t%f\n",xt,yt);}
-			//printf("%f %f \n",x,y);}
-		if(x*x+y*y<r*r & r*r-x*x-y*y<d){
-		  fprintf(pt,"%f\t%f\n",x,y);
-			fprintf(pttt,"%f\t%f\n",xt,yt);}
-			//printf("%f %f \n",x,y);} 
-	      if( b==r &  ((xt*xt)/(w*w))<1+d*2){
-		  fprintf(pttt,"%f\t 0\n",xt);}
-	   }
-		
-	 }
+ pt=fopen("burger.dat","w");
+ float dx,pi,umax;
+ pi =3.141569;
+ dx= 2*pi/N;
+ umax=1;
+ printf("%f", dt/dx);
+ float* u= malloc (N*sizeof(float));
+ float* dux= malloc (N*sizeof(float));
+ float* duxx= malloc (N*sizeof(float));
+ float t=0, x=0;
+ if(t<T){
+  for(int i=0;i<N;i++){  // aca   conseguimos u =sin (X)
+   float r;
+   r= x+i*dx;
+ 	u[i]=sin(r);
+ printf("%f\t%f\n",u[i],r);}
+ //  dux[0]=(u[1]-u[0])/(2*dx);  // du/dx en los bordes por separado considerando condiciones de contorno periodica
+  //dux[N-1]=(u[0]-u[N-2])/(2*dx);
+  for (int j=1;j<N-1;j++){
+  dux[j]=(u[j+1]-u[j-1])/(2*dx);} // du/dx  
 
-fclose(pt); 
-fclose(pttt); 
+  //duxx[1]=(u[1]-u[N])/(2*dx);    //d(du/dx)/dx en los bordes
+  //duxx[N]=(u[0]-u[N-1])/(2*dx);
+  for (int k=1;k<N;k++){
+  duxx[k]=(u[k+1]-2*u[k]+u[k-1])/(2*dx);}  // d(du/dx)/dx  
+ t=t+dt;}
+
+ free(duxx);
+ free(u);
+ free(dux);
+ fclose(pt);
  return(0);
 }
-
 
 
